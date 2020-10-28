@@ -1,0 +1,9 @@
+{
+    "/api/*":{
+        "target":"https://apirest-examen.herokuapp.com",
+        "pathRewrite": {
+            "^/api/*": ""
+        },
+        "secure": false
+    }
+}

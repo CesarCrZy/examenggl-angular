@@ -1,0 +1,279 @@
+<div class="row-xl-12">
+  <div class="col-xl-12">
+<h1>Lista de Articulos</h1>
+<!-- Button trigger modal -->
+<button id="Nuevo" class="btn btn-primary" data-toggle="modal" data-target="#Modal">
+  Agregar Articulo
+</button>
+<button id="Nuevo" class="btn btn-primary" data-toggle="modal" data-target="#OrdenModal" (click)="nuevaOrden()">
+  Nueva Orden
+</button>
+<button id="Nuevo" class="btn btn-primary" data-toggle="modal" data-target="#RecepcionModal" (click)="recepcion()">
+  Recepciones
+</button>
+<button id="Nuevo" class="btn btn-primary" data-toggle="modal" data-target="#SalidaModal" (click)="salida()">
+  Salidas
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Nuevo Articulo</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="articuloNuevo" (ngSubmit)="guardar(articuloNuevo.value)">
+          <div class="form-group">
+            <label>Nombre del Articulo</label>
+            <input formControlName="nombre" type="text" class="form-control" placeholder="Articulo">
+          </div>
+          <div class="form-group">
+            <label>Precio</label>
+            <input formControlName="precio" type="number" class="form-control" placeholder="Precio">
+          </div>
+          <div class="form-group">
+            <label>Tope Minimo</label>
+            <input formControlName="topemin" type="number" class="form-control" placeholder="">
+          </div>
+          <div class="form-group">
+            <label>Tope Maximo</label>
+            <input formControlName="topemax" type="number" class="form-control" placeholder="">
+          </div>
+          <div class="form-group">
+            <label >Inventario</label>
+            <input formControlName="inventario" type="number" class="form-control" placeholder="">
+          </div>
+          <button [disabled]="articuloNuevo.invalid" type="submit" class="btn btn-primary" >Guardar</button>
+        </form>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="SalidaModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel4"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel4">Salidas</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="salidaForm" (ngSubmit)="guardarSalida(salidaForm.value)">
+          <div class="form-group">
+            <label>Articulo</label>
+            <select id="cbxSalida" formControlName="articulo" class="form-control" (change)="OnChangeArticuloSalida($event.target.value)">
+              <option *ngFor="let salida of salidas" value="{{salida.id}}">
+                Articulo: {{salida.nombre}}, Proveedor: {{salida.proveedor}}
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Tipo Salida</label>
+              <select formControlName="tiposalida" class="form-control" (change)="OnChangeTipo($event.target.value)">
+                <option value="Proveedor">
+                  Proveedor
+                </option>
+                <option value="Almacen">
+                  Almacen
+                </option>
+              </select>
+            </div>
+            <div class="form-group" *ngIf="mostrar">
+              <label>Selecciona el Almacen</label>
+                <select formControlName="almacen" class="form-control">
+                  <option *ngFor="let almacen of almacenes" value="{{almacen.id}}">
+                    {{almacen.nombre}}
+                  </option>
+                </select>
+              </div>
+            <div class="form-group">
+              <label>Cantidad a salir</label>
+              <input *ngIf="oculto" formControlName="cantidad" type="number" class="form-control" max="{{topemax}}" min="{{topemin}}">
+              <label *ngIf="mostrarinf">Inventario actual: {{inventario}}, Cantidad Maxima que puede salir: {{topemax}}</label>
+              </div>
+          <button [disabled]="salidaForm.invalid" type="submit" class="btn btn-primary" >Guardar</button>
+        </form>
+      </div>
+      
+    </div>
+  </div>
+</div> 
+
+<div class="modal fade" id="RecepcionModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel3"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel3">Recepciones</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="recepcionForm" (ngSubmit)="guardarRecepcion(recepcionForm.value)">
+          <div class="form-group">
+            <label>Articulo</label>
+            <select id="cbxRecepcion" formControlName="articulo" class="form-control" (change)="OnChangeArticulo($event.target.value)">
+              <option *ngFor="let recepcion of recepciones" value="{{recepcion.id}}">
+                Articulo: {{recepcion.nombre}}, Proveedor: {{recepcion.proveedor}}
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Tipo Recepcion</label>
+              <select formControlName="tiporecepcion" class="form-control" (change)="OnChangeTipo($event.target.value)">
+                <option value="Proveedor">
+                  Proveedor
+                </option>
+                <option value="Almacen">
+                  Almacen
+                </option>
+              </select>
+            </div>
+            <div class="form-group" *ngIf="mostrar">
+              <label>Selecciona el Almacen</label>
+                <select formControlName="almacen" class="form-control">
+                  <option *ngFor="let almacen of almacenes" value="{{almacen.id}}">
+                    {{almacen.nombre}}
+                  </option>
+                </select>
+              </div>
+            <div class="form-group">
+              <label>Cantidad Solicitada</label>
+              <input *ngIf="oculto" formControlName="inventario" type="number" class="form-control" max="{{topemax}}" min="{{topemin}}">
+              <label *ngIf="mostrarinf1">Inventario actual: {{inventario}}, Cantidad Maxima que se puede recibir: {{topemax}}</label>
+              </div>
+          <button [disabled]="recepcionForm.invalid" type="submit" class="btn btn-primary" >Guardar</button>
+        </form>
+      </div>
+      
+    </div>
+  </div>
+</div> 
+<div class="modal fade" id="OrdenModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel2"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel2">Nueva Orden</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="ordenNueva" (ngSubmit)="guardarOrden(ordenNueva.value)">
+          <div class="form-group">
+            <label>Articulo</label>
+            <select id="cbxArticulo" formControlName="articulo" class="form-control">
+              <option *ngFor="let articulo of articulos" value="{{articulo.id}}">
+                {{articulo.nombre}}
+              </option>
+            </select>
+            <label id="labelArticulo"></label>
+          </div>
+          <div class="form-group">
+            <label>Proveedor</label>
+            <select id="cbxProveedor" formControlName="proveedor" class="form-control" >
+              <option *ngFor="let proveedor of proveedores" value="{{proveedor.id}}">
+                {{proveedor.nombre}}
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Tipo Orden</label>
+            <select formControlName="tipoorden" class="form-control">
+              <option>
+                Recepción
+              </option>
+              <option>
+                Salida
+              </option>
+            </select>
+          </div>
+          <button [disabled]="ordenNueva.invalid" type="submit" class="btn btn-primary">Guardar</button>
+        </form>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+<table class="table table-hover table-bordered">
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Precio</th>
+      <th scope="col">Nombre</th>
+      <th scope="col">Tope Minimo</th>
+      <th scope="col">Tope Maximo</th>
+      <th scope="col">Inventario</th>
+      <th scope="col">Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let articulo of articulos">
+      <td>{{articulo.id}}</td>
+      <td>{{articulo.precio}}</td>
+      <td>{{articulo.nombre}}</td>
+      <td>{{articulo.topemin}}</td>
+      <td>{{articulo.topemax}}</td>
+      <td>{{articulo.inventario}}</td>
+      <td>
+        <button class="btn btn-info" data-toggle="modal" data-target="#EditModal" (click)=editar(articulo.id)>Editar</button>
+        <button class="btn btn-danger" (click)="delete(articulo.id)">Eliminar</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+    
+<div class="modal fade" id="EditModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel1"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel1">Editar Articulo</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="articuloEditar" (ngSubmit)="guardareditar(articuloEditar.value)">
+          <div class="form-group">
+            <label>Nombre del Articulo</label>
+            <input formControlName="nombre" type="text" class="form-control" placeholder="Articulo">
+          </div>
+          <div class="form-group">
+            <label>Precio</label>
+            <input formControlName="precio" type="number" class="form-control" placeholder="Precio">
+          </div>
+          <div class="form-group">
+            <label>Tope Minimo</label>
+            <input formControlName="topemin" type="number" class="form-control" placeholder="">
+          </div>
+          <div class="form-group">
+            <label>Tope Maximo</label>
+            <input formControlName="topemax" type="number" class="form-control" placeholder="">
+          </div>
+          <div class="form-group">
+            <label >Inventario</label>
+            <input formControlName="inventario" type="number" class="form-control" placeholder="">
+          </div>
+          <button [disabled]="articuloEditar.invalid" type="submit" class="btn btn-primary" >Guardar</button>
+        </form>
+      </div>
+      
+    </div>
+  </div>
+</div>
+  </div>
+</div>
+<router-outlet></router-outlet>
